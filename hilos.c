@@ -17,6 +17,9 @@ struct rango{
 
 int main(int argc, char** argv){
   double tiempoInicial = obtenerTiempoActual();
+
+  srand(time(NULL));
+
   if (argc != 3){
     printf("Uso del programa <Tamano del arreglo> <Numero de hilos>\n");
     return -1;
@@ -30,7 +33,7 @@ int main(int argc, char** argv){
 
     for (int i=0; i<n; i++){
       arreglo[i] = aleatorio(1, 10);
-      printf("+%d", arreglo[i]);
+      //printf("+%d", arreglo[i]);
     }
     
     while((newsize % nhilos)!=0)
@@ -44,31 +47,32 @@ int main(int argc, char** argv){
     long suma = 0;
 
     for (int x=0; x<nhilos; x++){
-    	pthread_t h;
-    	struct rango *r = (struct rango *)malloc(sizeof(struct rango));
-    	r->arreglo = arreglo;
-    	r->inicio = c;
-    	r->fin = c + sizeSub - 1;
-      if ((pthread_create(&h, NULL, sumarSubArreglo, (void *)r)<0)){
-        printf("Algo salio mal con la creacion del hilo\n");
-        return -1;
-      }
-      idHilos[x] = h;
-      c += sizeSub;
-    }
-
-    if (newsize != n){
-      printf("Numeros falntantes: %d\n",n-newsize);
       pthread_t h;
-    	struct rango *r = (struct rango *)malloc(sizeof(struct rango));
-    	r->arreglo = arreglo;
-    	r->inicio = c;
-    	r->fin = n - 1;
-      if ((pthread_create(&h, NULL, sumarSubArreglo, (void *)r)<0)){
-        printf("Algo salio mal con la creacion del hilo\n");
-        return -1;
+      struct rango *r = (struct rango *)malloc(sizeof(struct rango));
+      if ((x==nhilos-1)&&(n!=newsize)){
+        r->arreglo = arreglo;
+        r->inicio = c;
+        r->fin = n-1;
+        //printf("\ni: %d --- f: %d",r->inicio,r->fin);
+        if ((pthread_create(&h, NULL, sumarSubArreglo, (void *)r)<0)){
+          printf("Algo salio mal con la creacion del hilo\n");
+          return -1;
+        }
+        idHilos[x] = h;
+        c += sizeSub;
       }
-      idHilos[nhilos-1] = h;
+      else{
+        r->arreglo = arreglo;
+        r->inicio = c;
+        r->fin = c + sizeSub - 1;
+        //printf("\ni: %d --- f: %d",r->inicio,r->fin);
+        if ((pthread_create(&h, NULL, sumarSubArreglo, (void *)r)<0)){
+          printf("Algo salio mal con la creacion del hilo\n");
+          return -1;
+        }
+        idHilos[x] = h;
+        c += sizeSub;
+      }
     }
 
     for (int x=0; x<nhilos; x++){
