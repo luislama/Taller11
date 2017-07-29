@@ -81,11 +81,13 @@ int main(int argc, char** argv){
       suma += *((long *)sumaparcial);
     }
 
-    printf("\nLa suma de los elementos es: %lu\n",suma);
+    //printf("\nLa suma de los elementos es: %lu\n",suma);
     
     double tiempoFinal = obtenerTiempoActual();
 
-    printf("Tiempo de ejecucion: %f\n\n",(tiempoFinal-tiempoInicial));
+    //printf("Tiempo de ejecucion: %f\n\n",(tiempoFinal-tiempoInicial));
+
+    printf("%d;%f;%lu\n",nhilos,(tiempoFinal-tiempoInicial),suma);
 
     return 0;
   } 
