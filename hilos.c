@@ -15,9 +15,9 @@ struct rango{
 } rango;
 
 
-int main(int argc, char** argv){
-  double tiempoInicial = obtenerTiempoActual();
-
+int main(int argc, char** argv)
+{
+  double tiempoIniTotal = obtenerTiempoActual();
   srand(time(NULL));
 
   if (argc != 3){
@@ -26,6 +26,8 @@ int main(int argc, char** argv){
   }
   else
   {
+    double tiempoIniGen = obtenerTiempoActual();
+
     long n = atol(argv[1]);
     int maxhilos = atoi(argv[2]);
     int nhilos = 1;
@@ -39,14 +41,15 @@ int main(int argc, char** argv){
 //      printf("+%d", arreglo[i]);
     }
 
-    double tiempoFinal = obtenerTiempoActual();
+    double tiempoFinGen = obtenerTiempoActual();
+
     printf("\nArreglo con %lu elementos\n",n);
-    printf("Tiempo de Construccion de arreglo: %.9f\n\n",(tiempoFinal-tiempoInicial));
+    printf("Tiempo de Construccion de arreglo: %.2f\n\n",(tiempoFinGen-tiempoIniGen));
 
     for(nhilos = 1; nhilos <= maxhilos; nhilos++)
     {
 
-      tiempoInicial = obtenerTiempoActual();
+      double tiempoIniHilo = obtenerTiempoActual();
 
       while((newsize % nhilos)!=0)
     	newsize -= 1;
@@ -62,34 +65,20 @@ int main(int argc, char** argv){
       {
         pthread_t h;
         struct rango *r = (struct rango *)malloc(sizeof(struct rango));
+        r->arreglo = arreglo;
+        r->inicio = c;
         if ((x==nhilos-1)&&(n!=newsize))
-        {
-          r->arreglo = arreglo;
-          r->inicio = c;
           r->fin = n-1;
-//          printf("\ni: %d --- f: %d",r->inicio,r->fin);
-          if ((pthread_create(&h, NULL, sumarSubArreglo, (void *)r)<0))
-          {
-            printf("Algo salio mal con la creacion del hilo\n");
-            return -1;
-          }
-          idHilos[x] = h;
-          c += sizeSub;
-        }
         else
-        {
-          r->arreglo = arreglo;
-          r->inicio = c;
           r->fin = c + sizeSub - 1;
-//        printf("\ni: %d --- f: %d",r->inicio,r->fin);
-          if ((pthread_create(&h, NULL, sumarSubArreglo, (void *)r)<0))
-          {
-            printf("Algo salio mal con la creacion del hilo\n");
-            return -1;
-          }
-          idHilos[x] = h;
-          c += sizeSub;
+//          printf("\ni: %d --- f: %d",r->inicio,r->fin);
+        if ((pthread_create(&h, NULL, sumarSubArreglo, (void *)r)<0))
+        {
+          printf("Algo salio mal con la creacion del hilo\n");
+          return -1;
         }
+        idHilos[x] = h;
+        c += sizeSub;
       }
 
       for (int x=0; x<nhilos; x++)
@@ -99,15 +88,14 @@ int main(int argc, char** argv){
         suma += *((long *)sumaparcial);
       }
 
-//      printf("\nLa suma de los elementos es: %lu\n",suma);
+      double tiempoFinHilo = obtenerTiempoActual();
 
-      tiempoFinal = obtenerTiempoActual();
-
-//      printf("Tiempo de ejecucion: %f\n\n",(tiempoFinal-tiempoInicial));
-      printf("numero Hilos: %d\ntiempo: %.9f\nSuma: %lu\n\n",nhilos,(tiempoFinal-tiempoInicial),suma);
-//      printf("%d;%f;%lu\n",nhilos,(tiempoFinal-tiempoInicial),suma);
+      printf("numero Hilos: %d\ntiempo: %.9f\nSuma: %lu\n\n",nhilos,(tiempoFinHilo-tiempoIniHilo),suma);
 
     }
+
+    double tiempoFinTotal = obtenerTiempoActual();
+    printf("Tiempo total de ejecución: %.2f\n",(tiempoFinTotal-tiempoIniTotal));
 
     return 0;
   }
