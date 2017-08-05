@@ -40,7 +40,7 @@ int main(int argc, char** argv)
 
     for (int i=0; i<n; i++)
     {
-      arreglo[i] = aleatorio(1, 10);
+      arreglo[i] = aleatorio(50, 200);
       sumaLineal += arreglo[i];
     }
 
